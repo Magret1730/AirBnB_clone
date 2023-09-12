@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 """Console for the HBNB project"""
 import cmd
+from models.base_model import BaseModel
+from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
@@ -19,7 +21,7 @@ class HBNBCommand(cmd.Cmd):
         """Quit command to exit the program"""
         return True
 
-    def create(self, line):
+    def do_create(self, line):
         """
         Creates a new instance of BaseModel,
         saves it (to the JSON file) and prints the id
@@ -33,7 +35,7 @@ class HBNBCommand(cmd.Cmd):
             new_instance.save()
             print(new_instance.id)
 
-    def show(self, line):
+    def do_show(self, line):
         """
         Prints the string representation of an instance based
         on the class name and id
@@ -62,7 +64,7 @@ class HBNBCommand(cmd.Cmd):
         obj = self.__objects[instance_key]
         print(str(obj))
 
-    def destroy(self, line):
+    def do_destroy(self, line):
         """
         Deletes an instance based on the class name and id
         """
@@ -90,7 +92,7 @@ class HBNBCommand(cmd.Cmd):
         del self.__objects[instance_key]
         self.save()
 
-        def all(self, line):
+        def do_all(self, line):
             """
             Prints all string representation of all instances based
             or not on the class name
@@ -111,7 +113,56 @@ class HBNBCommand(cmd.Cmd):
             for rep in instance_list:
                 print(rep)
 
+    def do_update(self, line):
+        """
+        Updates an instance based on the class name and id by adding
+        or updating attribute (save the change into the JSON file)
+        """
+        args = line.split()
+        if not args:
+            print("** class name missing **")
+            return
 
+        class_name = args[0]
+        if class_name not in self.__objects:
+            print("** class doesn't exist **")
+            return
+
+        if len(args) < 2:
+            print("** instance id missing **")
+            return
+
+        obj_id = args[1]
+        instance_key = f"{class_name} {obj_id}"
+
+        if instance_key not in self.__objects:
+            print("** no instance found **")
+            return
+
+        if len(args) < 3:
+            print("** instance id missing **")
+            return
+
+        attribute_name = arg[2]
+        if len(args) < 4:
+            print("** value missing **")
+        
+        new_value = args[3]
+        obj = self.__objects[instance_key]
+        if attribute_name in ['id', 'created_at', 'updated_at']:
+            print("** cannot update id, created_at, or updated_at **")
+            return
+        if attribute_name in obj.__dict__:
+            attr_type = type(obj.__dict__[attribute_name])
+            try:
+                new_value = attr_type(new_value)
+            except ValueError:
+                print("** invalid value type **")
+                return
+
+        setattr(obj, attribute_name, new_value)
+        self.save()
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
+    
