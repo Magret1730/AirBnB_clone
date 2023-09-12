@@ -2,7 +2,7 @@
 """An AIRBNB console package"""
 import uuid
 import datetime
-
+import models
 
 class BaseModel:
     """
@@ -10,11 +10,21 @@ class BaseModel:
     methods for other classes
     """
 
-    def __init__(self, id, created_at, updated_at):
-        """Constructor."""
-        self.id = uuid.uuid4()
-        self.created_at = datetime.datetime.now()
-        self.updated_at = datetime.datetime.now()
+    def __init__(self, *args, **kwargs):
+        """ constructor."""
+        if kwargs:
+            kwargs['created_at'] = datetime.strptime(kwarg.get['created_at'],
+                                                     '%Y-%m-%dT%H:%M:%S.%f')
+            kwargs['updated_at'] = datetime.strptime(kwargs.get['updated_at'],
+                                                     '%Y-%m-%dT%H:%M:%S.%f')
+
+            for key, value in kwargs.items():
+                if key != '__class__':
+                    setattr(self, key, value)
+        else:
+            self.id = uuid.uuid4()
+            self.created_at = datetime.datetime.now()
+            self.updated_at = datetime.datetime.now()
 
     def __str__(self):
         """
@@ -39,3 +49,4 @@ class BaseModel:
         d["__class__"] = self.__class__.__name__
         d["created_at"] = self.created_at.isoformat()
         d["updated_at"] = self.updated_at.isoformat()
+        
