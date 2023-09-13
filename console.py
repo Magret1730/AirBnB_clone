@@ -2,13 +2,14 @@
 """Console for the HBNB project"""
 import cmd
 from models.base_model import BaseModel
+from models.user import User
 from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
     """Console with cmd module"""
     prompt = "(hbnb) "
-    CLASSES = ["BaseModel"]
+    CLASSES = ["BaseModel", "User"]
 
     def do_create(self, line):
         """
@@ -25,13 +26,16 @@ class HBNBCommand(cmd.Cmd):
             if len(args) > 1:
                 attr_str = " ".join(args[1:])
                 try:
-                    new_instance = BaseModel(**eval("{" + attr_str + "}"))
+                    # new_instance = BaseModel(**eval("{" + attr_str + "}"))
+                    new_instance = self.create_obj_by_class_name(class_name,
+                                                                 attr_str)
                     new_instance.save()
                     print(new_instance.id)
                 except Exception as e:
                     print("** invalid attribute format: {}".format(e))
             else:
-                new_instance = BaseModel()
+                # new_instance = BaseModel()
+                new_instance = self.create_obj_by_class_name(class_name)
                 new_instance.save()
                 print(new_instance.id)
 
@@ -108,8 +112,31 @@ class HBNBCommand(cmd.Cmd):
                              for obj in objs
                              if obj.startswith(class_name + '.')]
 
-        for rep in instance_list:
-            print(rep)
+        formatted_output = "[" + ", ".join(['"' + instance + '"'
+                                            for instance in instance_list]) \
+            + "]"
+        print(formatted_output)
+
+    def create_obj_by_class_name(self, class_name, attr_str=""):
+        """
+        Dynamically create an object based on the class name and
+        initialize it with the provided attributes.
+        """
+        class_mapping = {
+            'BaseModel': BaseModel,
+            'User': User  # Add User to the class mapping
+        }
+        # Check if the class_name is in the mapping
+        if class_name in class_mapping:
+            # Get the corresponding class from the mapping
+            obj_class = class_mapping[class_name]
+            # Create an instance of the class with the provided attributes
+            obj = obj_class(**eval("{" + attr_str + "}"))
+            return obj
+        else:
+            # Handle the case where the class name is not recognized
+            raise ValueError(
+                f"Class '{class_name}' not found in class_mapping")
 
     def do_update(self, line):
         """
