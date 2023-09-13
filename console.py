@@ -14,7 +14,14 @@ from models.review import Review
 class HBNBCommand(cmd.Cmd):
     """Console with cmd module"""
     prompt = "(hbnb) "
-    CLASSES = ["BaseModel", "User"]
+    CLASSES = ["BaseModel",
+            "User",
+            "State",
+            "City",
+            "Amenity",
+            "Place",
+            "Review"
+            ]
 
     def do_create(self, line):
         """
@@ -194,6 +201,12 @@ class HBNBCommand(cmd.Cmd):
 
         setattr(obj, attribute_name, new_value)
         storage.save()
+
+    def default(self, line):
+        args = line.split('.')
+        if args[0] in self.CLASSES:
+            if args[1] == "all()":
+                self.do_all(args[0])
 
     def do_EOF(self, line):
         """EOF to exit the program"""
