@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """File storage"""
 from models.base_model import BaseModel
+from models.user import User
 import json
 
 
@@ -43,16 +44,15 @@ class FileStorage:
         Dynamically create an object based on the class name and
         initialize it with the provided attributes.
         """
-        class_mapping = {'BaseModel': BaseModel}
-        # Check if the class_name is in the mapping
+        class_mapping = {
+            'BaseModel': BaseModel,
+            'User': User
+            }
         if class_name in class_mapping:
-            # Get the corresponding class from the mapping
             obj_class = class_mapping[class_name]
-            # Create an instance of the class with the provided attributes
             obj = obj_class(**kwargs)
             return obj
         else:
-            # Handle the case where the class name is not recognized
             raise ValueError(
                     f"Class '{class_name}' not found in class_mapping")
 
