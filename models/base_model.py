@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""An AIRBNB Package"""
+"""An HBNB Package"""
 from datetime import datetime
 import uuid
 

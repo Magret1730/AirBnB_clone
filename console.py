@@ -1,27 +1,27 @@
 #!/usr/bin/python3
 """Console for the HBNB project"""
 import cmd
-from models.base_model import BaseModel
-from models.user import User
 from models import storage
-from models.state import State
-from models.city import City
 from models.amenity import Amenity
+from models.base_model import BaseModel
+from models.city import City
 from models.place import Place
 from models.review import Review
+from models.state import State
+from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
     """Console with cmd module"""
     prompt = "(hbnb) "
     CLASSES = ["BaseModel",
-            "User",
-            "State",
-            "City",
-            "Amenity",
-            "Place",
-            "Review"
-            ]
+               "User",
+               "State",
+               "City",
+               "Amenity",
+               "Place",
+               "Review"
+               ]
 
     def do_create(self, line):
         """
@@ -38,7 +38,6 @@ class HBNBCommand(cmd.Cmd):
             if len(args) > 1:
                 attr_str = " ".join(args[1:])
                 try:
-                    # new_instance = BaseModel(**eval("{" + attr_str + "}"))
                     new_instance = self.create_obj_by_class_name(class_name,
                                                                  attr_str)
                     new_instance.save()
@@ -46,7 +45,6 @@ class HBNBCommand(cmd.Cmd):
                 except Exception as e:
                     print("** invalid attribute format: {}".format(e))
             else:
-                # new_instance = BaseModel()
                 new_instance = self.create_obj_by_class_name(class_name)
                 new_instance.save()
                 print(new_instance.id)
@@ -67,7 +65,8 @@ class HBNBCommand(cmd.Cmd):
                 print("** instance id missing **")
             else:
                 obj_id = args[1]
-                instance_key = f"{class_name}.{obj_id}"
+                # instance_key = f"{class_name}.{obj_id}"
+                instance_key = class_name + "." + obj_id
                 objs = storage.all()
                 if instance_key not in objs:
                     print("** no instance found **")
@@ -95,8 +94,8 @@ class HBNBCommand(cmd.Cmd):
 
         obj_id = args[1]
         objs = storage.all()
-        instance_key = f"{class_name}.{obj_id}"
-
+        # instance_key = f"{class_name}.{obj_id}"
+        instance_key = class_name + "." + obj_id
         if instance_key not in objs:
             print("** no instance found **")
             return
@@ -136,8 +135,13 @@ class HBNBCommand(cmd.Cmd):
         """
         class_mapping = {
             'BaseModel': BaseModel,
-            'User': User  # Add User to the class mapping
-        }
+            'User': User,
+            "State": State,
+            "City": City,
+            "Amenity": Amenity,
+            "Place": Place,
+            "Review": Review
+           }
         # Check if the class_name is in the mapping
         if class_name in class_mapping:
             # Get the corresponding class from the mapping
@@ -148,7 +152,8 @@ class HBNBCommand(cmd.Cmd):
         else:
             # Handle the case where the class name is not recognized
             raise ValueError(
-                f"Class '{class_name}' not found in class_mapping")
+                # f"Class '{class_name}' not found in class_mapping")
+                "Class '{}' not found in class_mapping".format(class_name))
 
     def do_update(self, line):
         """
@@ -171,7 +176,7 @@ class HBNBCommand(cmd.Cmd):
 
         obj_id = args[1]
         objs = storage.all()
-        instance_key = f"{class_name}.{obj_id}"
+        instance_key = "{}.{}".format(class_name, obj_id)
 
         if instance_key not in objs:
             print("** no instance found **")
@@ -202,14 +207,30 @@ class HBNBCommand(cmd.Cmd):
         setattr(obj, attribute_name, new_value)
         storage.save()
 
+    def do_count(self, line):
+        """
+        retrieve the number of instances of a class
+        Usage: <class name>.count().
+        """
+        class_name = line.split('.')[0]
+        objs = storage.all()
+        count = 0
+        for obj in objs.values():
+            if class_name == obj.__class__.__name__:
+                count += 1
+        print(count)
+
     def default(self, line):
+        """Default command"""
         args = line.split('.')
         if args[0] in self.CLASSES:
+            if args[1] == "count()":
+                self.do_count(args[0])
             if args[1] == "all()":
                 self.do_all(args[0])
 
     def do_EOF(self, line):
-        """EOF to exit the program"""
+        """EOF command to exit the program"""
         return True
 
     def do_quit(self, line):
