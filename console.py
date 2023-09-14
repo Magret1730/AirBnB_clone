@@ -53,6 +53,24 @@ class HBNBCommand(cmd.Cmd):
         """
         Prints the string representation of an instance based
         on the class name and id
+         Usage: show BaseModel <id>
+        and
+        retrieve an instance based on its ID
+        Usage: <class name>.show(<id>).
+        """
+        args = line.split()
+        # print(args)
+        if args[0] == "User":
+            self.do_show0(line)
+        else:
+            self.do_show1(line)
+
+    @staticmethod
+    def do_show0(line):
+        """
+        Prints the string representation of an instance based
+        on the class name and id
+        Usage: show BaseModel <id>
         """
         args = line.split()
         if not args:
@@ -66,13 +84,29 @@ class HBNBCommand(cmd.Cmd):
             else:
                 obj_id = args[1]
                 # instance_key = f"{class_name}.{obj_id}"
-                instance_key = class_name + "." + obj_id
+                instance_key = "{}.{}".format(class_name, obj_id)
                 objs = storage.all()
                 if instance_key not in objs:
                     print("** no instance found **")
                 else:
                     obj = objs[instance_key]
                     print(obj)
+
+    @staticmethod
+    def do_show1(line):
+        """
+        retrieve an instance based on its ID
+        Usage: <class name>.show(<id>).
+        """
+        args = line.split(".")
+        class_name = args[0]
+        obj_id = args[1][5:-1]
+        objs = storage.all()
+        instance_key = "{}.{}".format(class_name, obj_id)
+        if instance_key in objs:
+            print(objs[instance_key])
+        else:
+            print("** no instance found **")
 
     def do_destroy(self, line):
         """
@@ -186,7 +220,8 @@ class HBNBCommand(cmd.Cmd):
             print("** value missing **")
             return
 
-        new_value = args[3]
+        # new_value = args[3]
+        attribute_value = " ".join(args[3:])
         obj = objs[instance_key]
         if attribute_name in ['id', 'created_at', 'updated_at']:
             print("** cannot update id, created_at, or updated_at **")
@@ -194,12 +229,12 @@ class HBNBCommand(cmd.Cmd):
         if attribute_name in obj.__dict__:
             attr_type = type(obj.__dict__[attribute_name])
             try:
-                new_value = attr_type(new_value)
+                new_value = attr_type(attribute_value)
             except ValueError:
                 print("** invalid value type **")
                 return
-
-        setattr(obj, attribute_name, new_value)
+        attribute_value = attribute_value.strip('"')
+        setattr(obj, attribute_name, attribute_value)
         storage.save()
 
     def do_count(self, line):
@@ -215,26 +250,9 @@ class HBNBCommand(cmd.Cmd):
                 count += 1
         print(count)
 
-    def do_show(self, line):
-        """
-        retrieve an instance based on its ID
-        Usage: <class name>.show(<id>).
-        """
-        args = line.split(".")
-        class_name = args[0]
-        id_str = args[1][5:-1]
-        objs = storage.all()
-        instance_key = "{}.{}".format(class_name, id_str)
-        if instance_key in objs:
-            print(objs[instance_key])
-        else:
-            print("** no instance found **")
-
-    def do_destroy(self, line):
-        """
+    """def do_destroy(self, line):
         destroy an instance based on his ID
         Usage: <class name>.destroy(<id>).
-        """
         args = line.split(".")
         class_name = args[0]
         id_str = args[1][8:-1]
@@ -243,7 +261,7 @@ class HBNBCommand(cmd.Cmd):
         if instance_key in objs:
             del objs[instance_key]
         else:
-            print("** no instance found **")
+            print("** no instance found **")"""
 
     def default(self, line):
         """Default command"""
