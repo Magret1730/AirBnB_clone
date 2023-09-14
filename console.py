@@ -59,6 +59,9 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.show(<id>).
         """
         args = line.split()
+        if not args:
+            print("** class name missing **")
+            return
         # print(args)
         if args[0] in HBNBCommand.CLASSES:
             self.do_show0(line)
@@ -99,8 +102,16 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.show(<id>).
         """
         args = line.split(".")
+        if not args:
+            print("** class name missing **")
+            return
         class_name = args[0]
+        if class_name not in HBNBCommand.CLASSES:
+            print("** class doesn't exist **")
+            return
         obj_id = args[1][5:-1]
+        obj_id = obj_id.strip('"')
+        # print(obj_id)
         objs = storage.all()
         instance_key = "{}.{}".format(class_name, obj_id)
         if instance_key in objs:
@@ -117,6 +128,9 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.destroy(<id>)
         """
         args = line.split()
+        if not args:
+            print("** class name missing **")
+            return
         # print(args)
         if args[0] in HBNBCommand.CLASSES:
             self.do_destroy0(line)
@@ -161,8 +175,15 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.destroy(<id>)
         """
         args = line.split(".")
+        if not args:
+            print("** class name missing **")
+            return
         class_name = args[0]
+        if class_name not in HBNBCommand.CLASSES:
+            print("** class doesn't exist **")
+            return
         id_str = args[1][8:-1]
+        id_str = obj_id.strip('"')
         objs = storage.all()
         instance_key = "{}.{}".format(class_name, id_str)
         if instance_key in objs:
@@ -222,6 +243,27 @@ class HBNBCommand(cmd.Cmd):
         """
         Updates an instance based on the class name and id by adding
         or updating attribute (save the change into the JSON file)
+        Usage: update <class name> <id> <attribute name> "<attribute value>"
+        and
+        update an instance based on his ID
+        Usage: <class name>.update(<id>, <attribute name>, <attribute value>)
+        """
+        args = line.split()
+        if len(args) == 0:
+            print("** class name missing **")
+            return
+        # print(args)
+        if args[0] in HBNBCommand.CLASSES:
+            self.do_update0(line)
+        else:
+            self.do_update1(line)
+
+    @staticmethod
+    def do_update0(line):
+        """
+        Updates an instance based on the class name and id by adding
+        or updating attribute (save the change into the JSON file)
+        Usage: update <class name> <id> <attribute name> "<attribute value>"
         """
         args = line.split()
         if len(args) == 0:
@@ -246,7 +288,7 @@ class HBNBCommand(cmd.Cmd):
             return
 
         if len(args) < 3:
-            print("** instance id missing **")
+            print("** attribute name missing **")
             return
 
         attribute_name = args[2]
@@ -254,7 +296,6 @@ class HBNBCommand(cmd.Cmd):
             print("** value missing **")
             return
 
-        # new_value = args[3]
         attribute_value = " ".join(args[3:])
         obj = objs[instance_key]
         if attribute_name in ['id', 'created_at', 'updated_at']:
@@ -270,6 +311,43 @@ class HBNBCommand(cmd.Cmd):
         attribute_value = attribute_value.strip('"')
         setattr(obj, attribute_name, attribute_value)
         storage.save()
+
+    @staticmethod
+    def do_update1(line):
+        """
+        Update an instance based on its ID
+        Usage: <class name>.update(<id>, <attribute name>, <attribute value>)
+        """
+        args = line.split(".")
+        if len(args) < 2:
+            print("** class name and method missing **")
+            return
+
+        class_name = args[0]
+        if class_name not in HBNBCommand.CLASSES:
+            print("** class doesn't exist **")
+            return
+
+        # Extract the method and parameters
+        method_args = args[1].strip('()').split(',')
+        if len(method_args) != 3:
+            print("** invalid method parameters **")
+            return
+
+        # Extract ID, attribute name, and attribute value
+        instance_id = method_args[0].strip()
+        attribute_name = method_args[1].strip()
+        attribute_value = method_args[2].strip()
+
+        objs = storage.all()
+        instance_key = "{}.{}".format(class_name, instance_id)
+
+        if instance_key in objs:
+            obj = objs[instance_key]
+            setattr(obj, attribute_name, attribute_value)
+            storage.save()
+        else:
+            print("** no instance found **")
 
     def do_count(self, line):
         """
