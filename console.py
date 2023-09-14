@@ -60,7 +60,7 @@ class HBNBCommand(cmd.Cmd):
         """
         args = line.split()
         # print(args)
-        if args[0] == "User":
+        if args[0] in HBNBCommand.CLASSES:
             self.do_show0(line)
         else:
             self.do_show1(line)
@@ -111,6 +111,23 @@ class HBNBCommand(cmd.Cmd):
     def do_destroy(self, line):
         """
         Deletes an instance based on the class name and id
+        Usuage: destroy BaseModel <id>
+        and
+        destroy an instance based on his ID
+        Usage: <class name>.destroy(<id>)
+        """
+        args = line.split()
+        # print(args)
+        if args[0] in HBNBCommand.CLASSES:
+            self.do_destroy0(line)
+        else:
+            self.do_destroy1(line)
+
+    @staticmethod
+    def do_destroy0(line):
+        """
+        Deletes an instance based on the class name and id
+        Usuage: destroy BaseModel <id>
         """
         args = line.split()
         if not args:
@@ -135,6 +152,23 @@ class HBNBCommand(cmd.Cmd):
             return
 
         del objs[instance_key]
+        storage.save()
+
+    @staticmethod
+    def do_destroy1(line):
+        """
+        destroy an instance based on his ID
+        Usage: <class name>.destroy(<id>)
+        """
+        args = line.split(".")
+        class_name = args[0]
+        id_str = args[1][8:-1]
+        objs = storage.all()
+        instance_key = "{}.{}".format(class_name, id_str)
+        if instance_key in objs:
+            del objs[instance_key]
+        else:
+            print("** no instance found **")
         storage.save()
 
     def do_all(self, line):
@@ -249,19 +283,6 @@ class HBNBCommand(cmd.Cmd):
             if class_name == obj.__class__.__name__:
                 count += 1
         print(count)
-
-    """def do_destroy(self, line):
-        destroy an instance based on his ID
-        Usage: <class name>.destroy(<id>).
-        args = line.split(".")
-        class_name = args[0]
-        id_str = args[1][8:-1]
-        objs = storage.all()
-        instance_key = "{}.{}".format(class_name, id_str)
-        if instance_key in objs:
-            del objs[instance_key]
-        else:
-            print("** no instance found **")"""
 
     def default(self, line):
         """Default command"""
