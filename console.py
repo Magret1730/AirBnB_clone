@@ -230,11 +230,28 @@ class HBNBCommand(cmd.Cmd):
         else:
             print("** no instance found **")
 
+    def do_destroy(self, line):
+        """
+        destroy an instance based on his ID
+        Usage: <class name>.destroy(<id>).
+        """
+        args = line.split(".")
+        class_name = args[0]
+        id_str = args[1][8:-1]
+        objs = storage.all()
+        instance_key = "{}.{}".format(class_name, id_str)
+        if instance_key in objs:
+            del objs[instance_key]
+        else:
+            print("** no instance found **")
+
     def default(self, line):
         """Default command"""
         args = line.split('.')
         if args[0] in self.CLASSES:
             command = args[1]
+            if command.startswith("destroy(") and command.endswith(")"):
+                self.do_destroy(args[0] + '.' + command)
             if command.startswith("show(") and command.endswith(")"):
                 self.do_show(args[0] + '.' + command)
             if command == "count()":
