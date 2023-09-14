@@ -134,25 +134,20 @@ class HBNBCommand(cmd.Cmd):
         initialize it with the provided attributes.
         """
         class_mapping = {
-            'BaseModel': BaseModel,
-            'User': User,
-            "State": State,
-            "City": City,
-            "Amenity": Amenity,
-            "Place": Place,
-            "Review": Review
-           }
-        # Check if the class_name is in the mapping
+                        'BaseModel': BaseModel,
+                        'User': User,
+                        'State': State,
+                        'City': City,
+                        'Amenity': Amenity,
+                        'Place': Place,
+                        'Review': Review
+                        }
         if class_name in class_mapping:
-            # Get the corresponding class from the mapping
             obj_class = class_mapping[class_name]
-            # Create an instance of the class with the provided attributes
             obj = obj_class(**eval("{" + attr_str + "}"))
             return obj
         else:
-            # Handle the case where the class name is not recognized
             raise ValueError(
-                # f"Class '{class_name}' not found in class_mapping")
                 "Class '{}' not found in class_mapping".format(class_name))
 
     def do_update(self, line):
@@ -220,13 +215,31 @@ class HBNBCommand(cmd.Cmd):
                 count += 1
         print(count)
 
+    def do_show(self, line):
+        """
+        retrieve an instance based on its ID
+        Usage: <class name>.show(<id>).
+        """
+        args = line.split(".")
+        class_name = args[0]
+        id_str = args[1][5:-1]
+        objs = storage.all()
+        instance_key = "{}.{}".format(class_name, id_str)
+        if instance_key in objs:
+            print(objs[instance_key])
+        else:
+            print("** no instance found **")
+
     def default(self, line):
         """Default command"""
         args = line.split('.')
         if args[0] in self.CLASSES:
-            if args[1] == "count()":
+            command = args[1]
+            if command.startswith("show(") and command.endswith(")"):
+                self.do_show(args[0] + '.' + command)
+            if command == "count()":
                 self.do_count(args[0])
-            if args[1] == "all()":
+            if command == "all()":
                 self.do_all(args[0])
 
     def do_EOF(self, line):
