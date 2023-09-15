@@ -9,6 +9,7 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
+import re
 
 
 class HBNBCommand(cmd.Cmd):
@@ -183,7 +184,7 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return
         id_str = args[1][8:-1]
-        id_str = obj_id.strip('"')
+        id_str = id_str.strip('"')
         objs = storage.all()
         instance_key = "{}.{}".format(class_name, id_str)
         if instance_key in objs:
@@ -247,16 +248,24 @@ class HBNBCommand(cmd.Cmd):
         and
         update an instance based on his ID
         Usage: <class name>.update(<id>, <attribute name>, <attribute value>)
+        and
+        Updates an instance based on the class name and id using a dictionary
+        Usage: <class name>.update(<id>, <dictionary representation>)
         """
         args = line.split()
+        # print(args)
         if len(args) == 0:
             print("** class name missing **")
             return
-        # print(args)
         if args[0] in HBNBCommand.CLASSES:
+            # if len(args) < 3:
+                # print("** instance id and attribute name missing **")
+                # return
             self.do_update0(line)
-        else:
+        if re.match(r'(\w+)\.update\("([\w-]+)", "([\w_]+)", "([\w\s]+)"\)', line):
             self.do_update1(line)
+        if re.match(r'(\w+)\.update\("([\w-]+)", \{.*\}\)$', line):
+            self.do_update_dic(line)
 
     @staticmethod
     def do_update0(line):
@@ -266,6 +275,7 @@ class HBNBCommand(cmd.Cmd):
         Usage: update <class name> <id> <attribute name> "<attribute value>"
         """
         args = line.split()
+        # print(args)
         if len(args) == 0:
             print("** class name missing **")
             return
@@ -319,6 +329,7 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.update(<id>, <attribute name>, <attribute value>)
         """
         args = line.split(".")
+        # print(args)
         if len(args) < 2:
             print("** class name and method missing **")
             return
@@ -335,9 +346,12 @@ class HBNBCommand(cmd.Cmd):
             return
 
         # Extract ID, attribute name, and attribute value
-        instance_id = method_args[0].strip()
-        attribute_name = method_args[1].strip()
-        attribute_value = method_args[2].strip()
+        instance_id_quotes = method_args[0].strip()
+        instance_id = instance_id_quotes.split('"')[1]
+        attribute_name_quotes = method_args[1].strip()
+        attribute_name = attribute_name_quotes.strip('"')
+        attribute_value_quotes = method_args[2].strip()
+        attribute_value = attribute_value_quotes.strip('"')
 
         objs = storage.all()
         instance_key = "{}.{}".format(class_name, instance_id)
@@ -348,6 +362,55 @@ class HBNBCommand(cmd.Cmd):
             storage.save()
         else:
             print("** no instance found **")
+
+    @staticmethod
+    def do_update_dic(line):
+        """
+        Updates an instance based on the class name and id using a dictionary
+        Usage: <class name>.update(<id>, <dictionary representation>)
+        """
+        args = line.split()
+        # print(args)
+        #if len(args) < 3:
+            #print("** instance id and dictionary representation #missing **")
+            #return
+        pattern = r'(\w+)\.update\("([\w-]+)",'
+        match = re.search(pattern, str(args))
+        class_name = match.group(1)
+        obj_id = match.group(2)
+        # class_name = args[0]
+        # print(class_name)
+        if class_name not in HBNBCommand.CLASSES:
+            print("** class doesn't exist **")
+            return
+
+        # obj_id = args[1]
+        objs = storage.all()
+        instance_key = "{}.{}".format(class_name, obj_id)
+        # print(instance_key)
+
+        if instance_key not in objs:
+            print("** no instance found **")
+            return
+
+        try:
+            dictionary_rep = " ".join(args[1:])
+            # print(dictionary_rep)
+            dictionary_rep = dictionary_rep.strip(')')
+            # print(dictionary_rep)
+            update_dict = eval(dictionary_rep)
+            # print(update_dict)
+            if not isinstance(update_dict, dict):
+                raise ValueError("Invalid dictionary representations")
+
+            obj = objs[instance_key]
+
+            for key, value in update_dict.items():
+                if key not in ['id', 'created_at', 'updated_at']:
+                    setattr(obj, key, value)
+            storage.save()
+        except Exception as e:
+            print("** invalid dictionary representation: {}".format(e))
 
     def do_count(self, line):
         """
@@ -367,6 +430,8 @@ class HBNBCommand(cmd.Cmd):
         args = line.split('.')
         if args[0] in self.CLASSES:
             command = args[1]
+            if command.startswith("update(") and command.endswith(")"):
+                self.do_update(args[0] + '.' + command)
             if command.startswith("destroy(") and command.endswith(")"):
                 self.do_destroy(args[0] + '.' + command)
             if command.startswith("show(") and command.endswith(")"):
