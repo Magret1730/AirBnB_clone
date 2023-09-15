@@ -258,11 +258,9 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return
         if args[0] in HBNBCommand.CLASSES:
-            # if len(args) < 3:
-                # print("** instance id and attribute name missing **")
-                # return
             self.do_update0(line)
-        if re.match(r'(\w+)\.update\("([\w-]+)", "([\w_]+)", "([\w\s]+)"\)', line):
+        if re.match(r'(\w+)\.update\("([\w-]+)", "([\w_]+)", "([\w\s]+)"\)',
+                    line):
             self.do_update1(line)
         if re.match(r'(\w+)\.update\("([\w-]+)", \{.*\}\)$', line):
             self.do_update_dic(line)
@@ -370,24 +368,16 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.update(<id>, <dictionary representation>)
         """
         args = line.split()
-        # print(args)
-        #if len(args) < 3:
-            #print("** instance id and dictionary representation #missing **")
-            #return
         pattern = r'(\w+)\.update\("([\w-]+)",'
         match = re.search(pattern, str(args))
         class_name = match.group(1)
         obj_id = match.group(2)
-        # class_name = args[0]
-        # print(class_name)
         if class_name not in HBNBCommand.CLASSES:
             print("** class doesn't exist **")
             return
 
-        # obj_id = args[1]
         objs = storage.all()
         instance_key = "{}.{}".format(class_name, obj_id)
-        # print(instance_key)
 
         if instance_key not in objs:
             print("** no instance found **")
