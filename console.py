@@ -29,10 +29,12 @@ class HBNBCommand(cmd.Cmd):
         Creates a new instance of BaseModel,
         saves it (to the JSON file) and prints the id
         """
+        # print(line)
         args = line.split(" ")
-        if len(args) == 0:
+        # if len(args) == 1:
+        if line == "":
             print("** class name missing **")
-        elif args[0] not in HBNBCommand.CLASSES:
+        elif line not in HBNBCommand.CLASSES:
             print("** class doesn't exist **")
         else:
             class_name = args[0]
@@ -257,6 +259,10 @@ class HBNBCommand(cmd.Cmd):
         if len(args) == 0:
             print("** class name missing **")
             return
+        class_name = args[0]
+        if class_name not in HBNBCommand.CLASSES:
+            print("** class doesn't exist **")
+            return
         if args[0] in HBNBCommand.CLASSES:
             self.do_update0(line)
         if re.match(r'(\w+)\.update\("([\w-]+)", "([\w_]+)", "([\w\s]+)"\)',
@@ -290,6 +296,7 @@ class HBNBCommand(cmd.Cmd):
         obj_id = args[1]
         objs = storage.all()
         instance_key = "{}.{}".format(class_name, obj_id)
+        # print(instance_key)
 
         if instance_key not in objs:
             print("** no instance found **")
@@ -430,6 +437,8 @@ class HBNBCommand(cmd.Cmd):
                 self.do_count(args[0])
             if command == "all()":
                 self.do_all(args[0])
+        else:
+            print("*** Unknown syntax: {}".format(line))
 
     def do_EOF(self, line):
         """EOF command to exit the program"""
