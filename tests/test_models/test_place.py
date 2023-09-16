@@ -6,7 +6,7 @@ from models.engine.file_storage import FileStorage
 from models.place import Place
 
 
-class TestState(unittest.TestCase):
+class TestPlace(unittest.TestCase):
     """Test cases for Place"""
     def test_instance_creation(self):
         """Test if you can create an instance of the Place class"""

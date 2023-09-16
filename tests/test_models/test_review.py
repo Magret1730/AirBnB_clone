@@ -6,7 +6,7 @@ from models.engine.file_storage import FileStorage
 from models.review import Review
 
 
-class TestState(unittest.TestCase):
+class TestReview(unittest.TestCase):
     """Test cases for Review"""
     def test_instance_creation(self):
         """Test if you can create an instance of the Review class"""
