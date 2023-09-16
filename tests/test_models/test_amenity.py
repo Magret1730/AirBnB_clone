@@ -6,7 +6,7 @@ from models.engine.file_storage import FileStorage
 from models.amenity import Amenity
 
 
-class TestState(unittest.TestCase):
+class TestAmenity(unittest.TestCase):
     """Test cases for Amenity"""
     def test_instance_creation(self):
         """Test if you can create an instance of the Amenity class"""
