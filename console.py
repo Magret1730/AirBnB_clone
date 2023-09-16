@@ -255,16 +255,16 @@ class HBNBCommand(cmd.Cmd):
         Usage: <class name>.update(<id>, <dictionary representation>)
         """
         args = line.split()
-        # print(args)
+        print(args[0])
         if len(args) == 0:
             print("** class name missing **")
             return
-        class_name = args[0]
-        if class_name not in HBNBCommand.CLASSES:
-            print("** class doesn't exist **")
-            return
         if args[0] in HBNBCommand.CLASSES:
             self.do_update0(line)
+        """class_name = args[0]
+        if class_name not in HBNBCommand.CLASSES:
+            print("** class doesn't exist **")
+            return"""
         if re.match(r'(\w+)\.update\("([\w-]+)", "([\w_]+)", "([\w\s]+)"\)',
                     line):
             self.do_update1(line)
@@ -279,7 +279,7 @@ class HBNBCommand(cmd.Cmd):
         Usage: update <class name> <id> <attribute name> "<attribute value>"
         """
         args = line.split()
-        # print(args)
+        print(args)
         if len(args) == 0:
             print("** class name missing **")
             return
