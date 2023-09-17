@@ -12,12 +12,12 @@ An imperative interface for overseeing our Airbnb clone entities:
 5. Eradicate an entity when necessary.
 
 **HOW TO USE:💻**
-* Clone this repository: git clone 
+* Clone this repository: git clone https://github.com/Emmanuelahdamilola/AirBnB_clone.git
 * Access AirBnb directory: cd AirBnB_clone
 * Run hbnb(interactively): ./console and enter command
 * Run hbnb(non-interactively): echo "<command>" | ./console.py
 
 **CONTRIBUTORS:👭**
 
-@Magret1730 - Github and @Emmanuelahdamilola - Github
+@Magret1730 - GitHub and @Emmanuelahdamilola - GitHub
 
