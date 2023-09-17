@@ -1,6 +1,9 @@
 **AIRBNB CLONE- The console**
 
-**DESCRIPTION:**
+This is ALX AirBnB clone project. The goal of the project is to deploy on your server a simple copy of the AirBnB website.
+This project was created to **Holberton School**
+
+**DESCRIPTION:📝**
 The console is the first part of the AirBnB project at Holberton School that will collectively cover fundamental concepts of higher level programming. The goal of AirBnB project is to deploy our server a simple copy of the AirBnB Website(HBnB). A command interpreter is created in this part to manage objects for the AirBnB(HBnB) website.
 This is the first step towards building our first full web application: the AirBnB clone.
 
