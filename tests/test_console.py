@@ -203,6 +203,16 @@ class TestConsole(unittest.TestCase):
             output = f.getvalue().strip()
             self.assertEqual(output, "")
 
+    def test_base_model_all(self):
+        """Test baseModel all"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd("BaseModel.all()")
+            output = f.getvalue().strip()
+        self.assertIn("[BaseModel]", output)
+        self.assertIn("created_at", output)
+        self.assertIn("updated_at", output)
+        self.assertIn("id", output)
+
 
 if __name__ == '__main__':
     unittest.main()
